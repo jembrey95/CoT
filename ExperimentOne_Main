@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>N Back Task</title>
+    <!-- jspsych plugins -->
+    <script src="jspsych-6.0.5/jspsych.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-html-button-response.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-image-keyboard-response.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-bandit-exp6.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-audio-keyboard-response.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-html-slider-response.js"></script>
+    <script src="jspsych-6.0.5/plugins/jspsych-survey-multi-choice.js"></script>
+    <!-- Fonts and CSS -->
+    <link href='https://fonts.googleapis.com/css?family=Bowlby One SC' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="jspsych-6.0.5/css/banditMagnitude-task.css" rel="stylesheet" type="text/css"></link>
+    <link href="jspsych-6.0.5/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+</head>
+<style>
+div.a {
+  font-size: 30px;
+}
+</style>
+<body>
+  <!-- Link to jquery and Bootstrap -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+  <script>
+
+  // Initialise some variables
+  let timeline = [];
+  let trialNumber = 0;
+  var PID = (Math.floor(Math.random() * 899999) + 100000).toString();
+  var filename = "nBack_" + PID;
+  //Ensuring there is a PID column  
+  jsPsych.data.addProperties({
+        PID: PID,
+  });
+ 
+
+  
+
+  //
+    window.onbeforeunload = function(){
+
+    		return "Are you sure you want to leave the experiment?";
+
+    	};
+
+ // Demographic information 
+
+ var prolificID = {
+   type: 'survey-text',
+   questions: [{prompt: "What is your Prolific ID?", placeholder: "12345", required: true}],
+ }
+
+ var age = {
+    type: 'survey-text',
+    questions: [{prompt: "Please enter your age", placeholder: "e.g., 21", required: true}],
+  };
+
+  var gender = {
+    type: "survey-multi-choice",
+    questions: [{prompt: "Please indicate your gender", options: ["Female", "Male", "Non-Binary", "Other", "I prefer not to answer"], required: true}],
+  };
+
+  timeline.push(prolificID, age, gender);
+
+
+
+ // Welcome message 
+
+ var welcome = {
+   timeline: [
+     {
+     type: 'html-keyboard-response',
+     stimulus: "<span style='font-size: 22px;'> Welcome to the experiment.</br></br>"+
+      "In this experiment you will be performing what is known as a <b>N-Back</b> task, but don't worry we will explain it before you start.</br></br>"+
+      "Before we begin, could you please place your phone out of sight and close any other tabs you have open which may distract you.</br>Thanks!</br></br>"+
+      "<b>You will be quizzed on these instructions, so it is best to read them carefully!</br></br></br></br></span>",
+     choices: jsPsych.NO_KEYS,
+     trial_duration: 5000
+     },
+     {
+     type: 'html-button-response',
+     stimulus: "<span style='font-size: 22px;'> Welcome to the experiment.</br></br>"+
+      "In this experiment you will be performing what is known as a <b>N-Back</b> task, but don't worry we will explain it before you start.</br></br>"+
+      "Before we begin, could you please place your phone out of sight and close any other tabs you have open which may distract you.</br>Thanks!</br></br>"+
+      "<b>You will be quizzed on these instructions, so it is best to read them carefully!</br></br></br></span>",
+     choices: ['Start'],
+     }
+    ]
+ }
+
+ timeline.push(welcome);
+
+ //Explanation of n-back task
+
+ var explain1 = {
+   timeline: [
+   {  
+   type: 'html-keyboard-response',
+   stimulus: "<span style='font-size: 22px;'>In the N-Back task random letters will appear on the screen, one after the other.</br></br>"+
+    "Your job is to determine whether the current letter matches the letter from 'N' trials ago.</br>Where N is a number, such as 1, 2, or 3.</br></br>"+
+    "On the next page we will show you what a 1-back task is like and how to do it — that is, where N = 1.</br></br></br>",
+   choices: jsPsych.NO_KEYS,
+   trial_duration: 5000
+   },
+   {  
+   type: 'html-button-response',
+   stimulus: "<span style='font-size: 22px;'>In the N-Back task random letters will appear on the screen, one after the other.</br></br>"+
+    "Your job is to determine whether the current letter matches the letter from 'N' trials ago.</br>Where N is a number, such as 1, 2, or 3.</br></br>"+
+    "On the next page we will show you what a 1-back task is like and how to do it — that is, where N = 1.</br></br>",
+   choices: ['Next'],
+   },
+  ]
+ }
+ timeline.push(explain1)
+
+
+// Initial variables needed for the n-back task
+var n_back_set = ['Z', 'X', 'C', 'V', 'B', 'N', 'R', 'P', 'T', 'S'];
+var sequence = [];
+var how_many_back = 0;
+var sequence_length = 30;
+var sequence_lengthPractice = 10
+var currentLetter = null;
+var a = 0
+
+
+// Random determiner of n-back length
+var nLengthArray = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5];
+var nLengthArray = jsPsych.randomization.sampleWithoutReplacement(nLengthArray, 18);
+
+var nLengthDeterminer = {
+  type: 'html-button-response',
+  stimulus: function() {
+    sequence = [];
+    if(nLengthArray.length > 0) {
+    how_many_back = nLengthArray[a]
+    }
+    if(how_many_back > 0) {
+    return "The next phase will be a:</br></br>"+
+    '<span style="font-size: 60px;"></br>'+how_many_back+'-back task</br></br></span>'+
+    "Press 'm' if the current letter matches the letter from "+how_many_back+" trials ago.</br></br>"
+    } else if(how_many_back == 0) {
+      return "The next phase will be a:</br></br>"+
+      '<span style="font-size: 60px;"></br>'+how_many_back+'-back task</br></br></span>'+
+      "Press 'm' each time a letter appears on the screen.</br></br>"
+    }
+  },
+  choices: ['Start'],
+  prompt: "",
+  on_finish: function(data) {
+    data.how_many_back = how_many_back;
+    a = a + 1;
+  }
+};
+
+
+ var n_back_trial = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        if(how_many_back == 0) {
+          var letter = jsPsych.randomization.sampleWithReplacement(n_back_set, 1)[0]
+        } else {
+          if(sequence.length < how_many_back){
+          var letter = jsPsych.randomization.sampleWithoutReplacement(n_back_set, 1)[0]
+          } else {
+             if(jsPsych.timelineVariable('match', true) == true){
+              var letter = sequence[sequence.length - how_many_back];
+            } else {
+              var possible_letters = jsPsych.randomization.sampleWithoutReplacement(n_back_set, 2);
+              if(possible_letters[0] != sequence[sequence.length - how_many_back]){
+              var letter = possible_letters[0];
+            } else {
+              var letter = possible_letters[1];
+            }
+          }
+        }
+        };
+        sequence.push(letter);
+        currentLetter = letter;
+        return '<span style="font-size: 140px;">'+letter+'</span>'
+      },
+      choices: ['M'],
+      trial_duration: 2000,
+      response_ends_trial: false,
+      post_trial_gap: 1500,
+      data: {
+        phase: 'test',
+        match: jsPsych.timelineVariable('match')
+      },
+      on_finish: function(data){
+        data.trialNumber = trialNumber++;
+        data.how_many_back = how_many_back;
+        data.currentLetter = currentLetter;
+        if(data.match == true){
+          data.correct = (data.key_press != null)
+        }
+        if(data.match == false){
+          data.correct = (data.key_press === null)
+        }
+        if(data.correct == true) {
+          nextFeedback = '<span style="font-size: 20px;"><b>correct!</b></span>'
+        }  else {
+          nextFeedback = '<span style="font-size: 20px;"><b>Wrong!</b></span>'
+        };
+        }
+      };
+/*
+      var n_back_trial = {
+      type: 'html-keyboard-response',
+      stimulus: function() {
+        if(sequence.length < how_many_back){
+          var letter = jsPsych.randomization.sampleWithoutReplacement(n_back_set, 1)[0]
+        } else {
+          if(jsPsych.timelineVariable('match', true) == true){
+            var letter = sequence[sequence.length - how_many_back];
+          } else {
+            var possible_letters = jsPsych.randomization.sampleWithoutReplacement(n_back_set, 2);
+            if(possible_letters[0] != sequence[sequence.length - how_many_back]){
+              var letter = possible_letters[0];
+            } else {
+              var letter = possible_letters[1];
+            }
+          }
+        };
+        if(sequence.length == sequence_length) {
+          sequence = []
+        };
+        sequence.push(letter);
+        currentLetter = letter;
+        return '<span style="font-size: 120px;">'+letter+'</span>'
+      },
+      choices: ['M'],
+      trial_duration: 1500,
+      response_ends_trial: false,
+      post_trial_gap: 1000,
+      data: {
+        phase: 'test',
+        match: jsPsych.timelineVariable('match')
+      },
+      on_finish: function(data){
+        data.trialNumber = trialNumber++;
+        data.how_many_back = how_many_back;
+        data.currentLetter = currentLetter;
+        if(data.match == true){
+          data.correct = (data.key_press != null)
+        }
+        if(data.match == false){
+          data.correct = (data.key_press === null)
+        }
+        if(data.correct == true) {
+          nextFeedback = '<span style="font-size: 20px;"><b>correct!</b></span>'
+        }  else {
+          nextFeedback = '<span style="font-size: 20px;"><b>Wrong!</b></span>'
+        };
+        }
+      };
+
+      */
+
+   // Variable if we want trial x trial feedback, seems too difficult to do task with it.  
+  /*  var trialFeedback = {
+      type: 'html-keyboard-response',
+      stimulus: function(){
+        if(trialNumber > 2) {
+        return nextFeedback 
+       }
+       else {
+         return ""
+       }
+      },
+      trial_duration: 500, 
+      }; */
+
+    var n_back_trials = [
+      {match: true},
+      {match: false}
+    ]
+
+    
+    // For real task
+    var n_back_sequence = {
+      timeline: [n_back_trial],
+      timeline_variables: n_back_trials,
+      sample: {
+        type: 'with-replacement',
+        size: sequence_length,
+        weights: [1, 2]
+      }
+    };
+
+
+    /* feedback for n-back task performance */
+
+    var oneBack_total = 0
+    var twoBack_total = 0
+    var threeBack_total = 0
+    var fourBack_total = 0
+    var fiveBack_total = 0
+    var percentCorrect = 0
+
+    var feedbackPractice = {
+      type: 'html-button-response',
+      stimulus: function(){
+        var test_trials = jsPsych.data.get().filter({phase: 'test'}).last(sequence_lengthPractice-how_many_back);
+        var n_match = test_trials.filter({match: true}).count();
+        var n_nonmatch = test_trials.filter({match: false}).count();
+        var n_correct = test_trials.filter({match: true, correct: true}).count();
+        var false_alarms = test_trials.filter({match: false, correct: false}).count();
+        var difference = n_match - n_correct;
+        percentCorrect = (((n_match+n_nonmatch-difference-false_alarms)/(n_match+n_nonmatch))*100).toFixed(2)
+
+        var html = "<div style='width:800px;'>"+
+          "<p>All done!</p>"+
+          "<p>You correctly identified "+n_correct+" of the "+n_match+" matching items.</p>"+
+          "<p>You incorrectly identified "+false_alarms+" of the "+n_nonmatch+" non-matching items as matches.</p>"+
+          "On average, you got "+percentCorrect+" percent correct."
+        
+        return html;
+      },
+      choices: ['Next'],
+    }
+
+    var feedback = {
+      type: 'html-button-response',
+      stimulus: function(){
+        var test_trials = jsPsych.data.get().filter({phase: 'test'}).last(sequence_length-how_many_back);
+        var n_match = test_trials.filter({match: true}).count();
+        var n_nonmatch = test_trials.filter({match: false}).count();
+        var n_correct = test_trials.filter({match: true, correct: true}).count();
+        var false_alarms = test_trials.filter({match: false, correct: false}).count();
+        var difference = n_match - n_correct;
+        percentCorrect = (((n_match+n_nonmatch-difference-false_alarms)/(n_match+n_nonmatch))*100).toFixed(2)
+        var mPressCount = test_trials.filter({key_press: 77}).count();
+
+
+        if(how_many_back > 0) {
+        var html = "<div style='width:800px;'>"+
+          "<p>All done!</p>"+
+          "<p>You correctly identified "+n_correct+" of the "+n_match+" matching items.</p>"+
+          "<p>You incorrectly identified "+false_alarms+" of the "+n_nonmatch+" non-matching items as matches.</p>"+
+          "<p>On average, you got <b>"+percentCorrect+" percent</b> correct.</p>"
+        } else if(how_many_back == 0) {
+          var html = "<div style='width:800px;'>"+
+          "<p>All done!</p>"+
+          "<p>You pressed 'm' on "+mPressCount+" of the total 30 trials.</p>"+
+          "<p>You got <b>"+((mPressCount/30)*100).toFixed(2)+" percent</b> correct.</p>"
+        }
+        
+        
+        return html;
+      },
+      choices: ['Next'],
+      on_finish: function() {
+        if(how_many_back == 1) {
+           oneBack_total = oneBack_total + parseInt(percentCorrect)
+        } else if(how_many_back == 2) {
+          twoBack_total = twoBack_total + parseInt(percentCorrect)
+        } else if(how_many_back == 3) {
+          threeBack_total = threeBack_total + parseInt(percentCorrect)
+        } else if(how_many_back == 4) {
+          fourBack_total = fourBack_total + parseInt(percentCorrect)
+        } else if (how_many_back == 5) {
+          fiveBack_total = fiveBack_total + parseInt(percentCorrect)
+        }
+      }
+    }
+
+ //Example of 1-back task
+ var oneBackExample = {
+   timeline: [
+     {
+       type: 'html-button-response',
+       stimulus: "<img src= 'cues/backOne.png'></img></br></br>"+
+       "<span style='font-size: 22px;'>In a <b>1-back</b> task, you are required to answer whether the current letter matches the letter from <b>one trial ago</b>.</br></br>"+
+       "If the current letter matches the letter from one trial before, press 'm' on your keyboard while the letter is on screen.</br>"+
+       "If the current letter is different, you don't need to press anything.</br></br>"+
+       "<p><b>In the example above, you should press 'm' on trial 3 as the current letter (X) is the same as the letter one trial before (X on trial 2).</b></p>"+
+       "Press 'Watch Practice 1-Back' to see an example of how to perform the task.</br></br></span>",
+       choices: ['Watch Practice 1-Back']
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;">X</span>',
+       choices: ['M'],
+       trial_duration: 1500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;">B</span>',
+       choices: ['M'],
+       trial_duration: 1500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;"></br>B</br></br></span>'+
+       "<span style='font-size: 20px;'>On this trial you <b>should</b> press 'm' because the current letter (B) is the same as the trial before (B).</span>",
+       choices: ['M'],
+       trial_duration: 7500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;"></br>V</br></br></span>'+
+       "<span style='font-size: 20px;'>On this trial you <b>should not</b> press 'm' because the current letter (V) is <b>not</b> the same letter as the trial before (B).</span>",
+       choices: ['M'],
+       trial_duration: 7500,
+       post_trial_gap: 1000,
+       response_ends_trial: false,
+     },
+   ]
+ }
+
+ timeline.push(oneBackExample)
+
+
+// For practice task 1-back
+ var oneBackTestRun = {
+   type: 'html-button-response',
+   stimulus: function(){
+     sequence = [];
+    if(how_many_back >= 0){
+      how_many_back = 1
+    } 
+    return "<span style='font-size: 22px;'>We're now going to let you try a <b>1-back</b> task for real, with some feedback on your performance.</br></br>"+
+      "Remember to press 'm' if the current letter matches the letter from one trial ago.</br></br></span>"
+    },
+   choices: ['Start']
+ };
+   
+ var n_back_sequenceTestRun = {
+      timeline: [n_back_trial],
+      timeline_variables: n_back_trials,
+      sample: {
+        type: 'with-replacement',
+        size: sequence_lengthPractice,
+        weights: [1, 2]
+      }
+    };
+
+timeline.push(oneBackTestRun, n_back_sequenceTestRun, feedbackPractice)
+
+
+
+ //Practice run a for a 2-back task
+
+ var twoBackExample = {
+   timeline: [
+     {
+       type: 'html-button-response',
+       stimulus: "<img src= 'cues/backTwo.png'></img></br></br>"+
+       "<span style='font-size: 22px;'>Now you have seen a 1-back task, we will show you how a 2-back task works.</br></br>"+
+       "In a <b>2-back</b> task, you are required to answer whether the current letter matches the letter from <b>two trials ago</b>.</br></br>"+
+       "If the current letter matches the letter from two trials before, press 'm' on your keyboard while the letter is on screen.</br>"+
+       "If the current letter is different, you don't need to press anything.</br></br>"+
+       "<p><b>For the above example, you should press 'm' on trial 4 as the letter (X) is the same as two trials ago (X on trial 2).</b></p>"+
+       "Press 'Watch Practice 2-Back' to see an example of how to perform the task.</br></br></span>",
+       choices: ['Watch Practice 2-Back']
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;">C</span>',
+       choices: ['M'],
+       trial_duration: 1500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;">Z</span>',
+       choices: ['M'],
+       trial_duration: 1500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;"></br>C</br></br></span>'+
+       "<span style='font-size: 20px;'>On this trial you <b>should</b> press 'm' because the current letter (C) is the same letter as two trials ago (C).</span>",
+       choices: ['M'],
+       trial_duration: 7500,
+       post_trial_gap: 1500,
+       response_ends_trial: false,
+     },
+     {
+       type: 'html-keyboard-response',
+       stimulus: '<span style="font-size: 140px;"></br>V</br></br></span>'+
+       "<span style='font-size: 20px;'>On this trial you <b>should not</b> press 'm' because the current letter (V) is <b>not</b> the same letter as two trials ago (Z).</span>",
+       choices: ['M'],
+       trial_duration: 7500,
+       post_trial_gap: 1000,
+       response_ends_trial: false,
+     },
+   ]
+ };
+
+ timeline.push(twoBackExample)
+
+ // Practice test run of the 2-back task
+
+ var twoBackTestRun = {
+   type: 'html-button-response',
+   stimulus: function(){
+     sequence = [];
+    if(how_many_back >= 0){
+      how_many_back = 2
+    } 
+    return "<span style='font-size: 22px;'>We're now going to let you try a <b>2-back</b> task for real, with some feedback on your performance.</br></br>"
+    },
+   choices: ['Start']
+ };
+ 
+
+timeline.push(twoBackTestRun, n_back_sequenceTestRun, feedbackPractice)
+
+// Beginning of real task
+
+var startTask1 = {
+  type: 'html-button-response',
+  stimulus: "<span style='font-size: 22px;'>You are now going to undertake a number of N-Back tasks with different 'N' values (from 0 up to 5).</br></br>"+
+  "Like the 1-back and 2-back, the number in front tells you how many back you need to remember.</br></br>"+
+  "For example, in a <b>5-back</b> you need to press 'm' if the current letter matches the letter from <b>5 trials</b> ago.</br></br></br>"+
+  "During a <b>0-back</b> task you just need to press 'm' every time a letter appears on the screen.</br></br>"+
+  "Try as hard as you can in each task; you will be given feedback after each one, similar to the feedback you received earlier.</br></br></span>",
+  choices: ['Begin Tasks']
+};
+
+timeline.push(startTask1);
+
+/*var startTask2 = {
+  type: 'html-button-response',
+  stimulus: "<span style='font-size: 22px;'>There will also be a <b>0-back task</b>.</br></br>"+
+    "During a 0-back, you just need to press 'm' every time a letter appears on the screen.</br>"+
+    "You don't need to remember the letters.</br></br></br>"+
+    "Press 'Begin Tasks' to begin the experiment.</br></br>",
+  choices: ['Begin Tasks'],
+};
+
+timeline.push(startTask2) */
+
+// Running the task: description, nBack, feedback. 
+ var nBackLoop = [nLengthDeterminer, n_back_sequence, feedback]
+ timeline = timeline.concat(nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop, nBackLoop)
+
+
+
+// Discounting task starting parameters
+  var choiceNumber = 1; //the trial number of choices
+  var leftMoney = 2; //starting value for 1-back
+  var rightMoney = 2; // starting value for N-back (>1)
+  var additive = 1 // The amount added or substracted from the left option (first one is actually .5, check code for why)
+  var run = 0 // to determine which run of 1 v n we are up to. 
+  var titrateSide = 2
+  var cogedArray = [];
+  var backCompare = 0
+  var choice = null
+
+//Explanation of the COG-ED task
+var cogED_Instruct = {
+  type: 'html-button-response',
+  stimulus: "<span style='font-size: 22px;'>Congratulations on finishing the first phase.</br></br>"+
+    "In this next section, you will choose between two options.</br>"+
+    "Choosing the option which you would prefer to complete for the amount of money specified.</br></br>"+
+    "The choices will be between two different n-back levels, and the amount of money available for completing either task will change.</br></br></span>",
+  choices: ['Next']
+};
+
+var cogED_Instruct2 = {
+  type: 'html-button-response',
+  stimulus: "<span style='font-size: 22px;'><b>EXAMPLE</b></br></br>"+
+    "One of the choices you make will be chosen at random. At the end you will complete that choice for the specified amount of money three (3) times.</br></br>"+
+    "Below is an example of what the choices might look like and what the choices mean.</br></br></span>",
+  choices: ["<span style='font-size: 24px;'>1-back for <b>$1.00</b></span>", "<span style='font-size: 24px;'>2-back for <b>$2.00</b></span>"],
+  prompt: "<span style='font-size: 22px;'></br>Above, if you choose the left option, you would prefer to do a 1-back task 3 times, receiving $1.00 payment for each time.</br></br>"+
+    "If you choose the right option, you would prefer to do a 2-back task 3 times, receiving $2.00 payment for each time.</br></br>"+
+    "Press either of the above buttons to continue (these are just examples, your choice won't be recorded).</span>"
+}
+
+var cogED_Instruct3 = {
+  type: 'html-button-response',
+  stimulus: "<span style='font-size: 22px;'>We will monitor your engagement and effort during the n-back task you complete 3 times at the end.</br></br>"+
+    "You will only be paid the specified amount of money per completion if you maintain your effort during the task.</br>"+
+    "Press 'Next' to begin the task.</br></br></span>",
+  choices: ["Next"]
+};
+
+timeline.push(cogED_Instruct, cogED_Instruct2, cogED_Instruct3);
+
+
+//COG-ED Trials for a 0-back vs n-back
+
+var secondChoiceZero = [1,2,3,4,5]
+secondChoiceZero = jsPsych.randomization.sampleWithoutReplacement(secondChoiceZero, 5)
+     
+// COG-ED trials for 1 vs n-back
+var secondChoice = [2,3,4,5]
+secondChoice = jsPsych.randomization.sampleWithoutReplacement(secondChoice, 4)
+
+var combinedArray = secondChoiceZero.concat(secondChoice);
+
+
+
+var discountInformation = {
+  type: 'html-button-response',
+  stimulus: function() {
+    if(run <= 4) {
+      return "For this section of the task, you are going to choose which task you would prefer given the amount of money you will be paid to complete the task.</br></br>"+
+      "<b>In this section it will be between a 0-back task and a "+combinedArray[run]+"-back task.</b></br>"+
+      "Remember, one of these choices will be selected at random and you will perform the chosen task for the chosen amount of money."
+    } else if(run > 4) {
+      return "For this section of the task, you are going to choose which task you would prefer given the amount of money you will be paid to complete the task.</br></br>"+
+      "<b>In this section it will be between a 1-back task and a "+combinedArray[run]+"-back task.</b></br>"+
+      "Remember, one of these choices will be selected at random and you will perform the chosen task for the chosen amount of money."
+    }
+  },
+  choices: ['start']
+}
+
+var discountTaskTrial = {
+  type: 'html-button-response',
+  stimulus: "Which of the below options would you prefer.</br></br>",
+  choices: function() {
+    if(run <= 4) {
+    return ["<span style='font-size: 24px;'>0-back for <b>$" + leftMoney.toFixed(2) + "</span>", "<span style='font-size: 24px;'>"+combinedArray[run]+"-back for <b>$" + rightMoney.toFixed(2) + "</span>"];
+    } else if(run > 4) {
+      return ["<span style='font-size: 24px;'>1-back for <b>$" + leftMoney.toFixed(2) + "</span>", "<span style='font-size: 24px;'>"+combinedArray[run]+"-back for <b>$" + rightMoney.toFixed(2) + "</span>"];
+    }
+  },
+  prompt: "",
+  post_trial_gap: 500,
+  on_finish: function(data) {
+    if(run <= 4) {
+    data.comparison = "0 v " + combinedArray[run]
+    } else {
+      data.comparison = "1 v " + combinedArray[run]
+    }
+    if(data.button_pressed == 0 && choiceNumber == 1) {
+    titrateSide = 0
+    data.cogED_Choice = "1-back for "+leftMoney.toFixed(2);
+    choice = "1-back for "+leftMoney.toFixed(2);
+    leftMoney = leftMoney - additive;
+    } else if(data.button_pressed == 1 & choiceNumber == 1){
+    titrateSide = 1
+    data.cogED_Choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+    choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+    rightMoney = rightMoney - additive;
+    } else if(data.button_pressed == 0 && titrateSide == 0){
+    data.cogED_Choice = "1-back for "+leftMoney.toFixed(2);
+    choice = "1-back for "+leftMoney.toFixed(2);
+    leftMoney = leftMoney - additive;
+    } else if(data.button_pressed ==  0 && titrateSide == 1){
+      data.cogED_Choice = "1-back for "+leftMoney.toFixed(2);
+      choice = "1-back for "+leftMoney.toFixed(2);
+      rightMoney = rightMoney + additive;
+    } else if(data.button_pressed == 1 && titrateSide == 0) {
+      data.cogED_Choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+      choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+      leftMoney = leftMoney + additive;
+    } else if (data.button_pressed == 1 && titrateSide == 1){
+      data.cogED_Choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+      choice = combinedArray[run] + "-back for " + rightMoney.toFixed(2);
+      rightMoney = rightMoney - additive;
+    }
+    data.choiceNumber = choiceNumber++ 
+    if(choiceNumber == 8 && titrateSide == 0) {
+      data.indifferencePoint = leftMoney
+      run = run + 1
+      choiceNumber = 1
+      additive = 2
+      leftMoney = 2
+      rightMoney = 2
+      data.preference = "easy"
+    } else if(choiceNumber == 8 && titrateSide == 1){
+      data.indifferencePoint = rightMoney
+      run = run + 1
+      choiceNumber = 1
+      additive = 2
+      leftMoney = 2
+      rightMoney = 2
+      data.preference = "hard"
+    }
+    additive = additive/2
+    cogedArray.push(choice)
+ }
+};
+
+var discountLoop = [discountTaskTrial, discountTaskTrial, discountTaskTrial, discountTaskTrial, discountTaskTrial, discountTaskTrial, discountTaskTrial]
+timeline = timeline.concat(discountInformation, discountLoop, discountInformation, discountLoop, discountInformation, discountLoop, discountInformation, discountLoop,
+                          discountInformation, discountLoop, discountInformation, discountLoop, discountInformation, discountLoop, discountInformation, discountLoop,discountInformation, discountLoop)
+
+//Select random trial, and participant performs task 5 times
+
+var randomTrial = null
+
+var threeTrialFinish = {
+  type: 'html-button-response',
+  stimulus: function() {
+    randomTrial = jsPsych.randomization.sampleWithoutReplacement(cogedArray,1)[0];
+    how_many_back = parseInt(randomTrial.slice(0,1));
+    if(randomTrial.slice(0,6) == '1-back') {
+       averagePerf = (oneBack_total/3)
+    } else if(randomTrial.slice(0,6) == '2-back'){
+       averagePerf = (twoBack_total/3)
+    } else if(randomTrial.slice(0,6) == '3-back') {
+       averagePerf = (threeBack_total/3)
+    } else if(randomTrial.slice(0,6) == '4-back') {
+       averagePerf = (fourBack_total/3)
+    } else if(randomTrial.slice(0,6) == '5-back') {
+       averagePerf = (fiveBack_total/3)
+    }
+   return  "<span style='font-size: 24px;'>The program has randomly selected one of your choices from before:</br></br>"+
+    "<b>"+randomTrial+"</b></br></br>"+
+    "This means you will complete a "+randomTrial.slice(0,6)+" 3 times. Receiving $"+randomTrial.slice(11,15)+" for each completion.</br></br>"+
+    "Remember, we will be monitoring your effort, which will determine whether you are paid for each task completion.</br></br>"
+  },
+  choices: ['Next']
+};
+
+timeline.push(threeTrialFinish)
+
+// Final 5 trials
+
+var lengthFinal = {
+  type: 'html-button-response',
+  stimulus: "The next phase will be:</br></br>",
+  choices: ['Start'],
+  prompt: function() {
+    if(how_many_back > 0) {
+    return '<span style="font-size: 60px;"></br>'+how_many_back+'-back task.</br></br></span>'+
+      "Press 'm' if the current letter matches the letter from "+how_many_back+" trials ago."
+    } else if(how_many_back == 0) {
+      return '<span style="font-size: 60px;"></br>'+how_many_back+'-back task.</br></br></span>'+
+      "Press 'm' each time a letter appears on the screen."
+    }
+  },
+  on_finish: function(data) {
+    data.how_many_back = how_many_back;
+  }
+};
+
+
+var nBackLoopFinalRuns = [lengthFinal, n_back_sequence, feedback]
+
+timeline = timeline.concat(nBackLoopFinalRuns,nBackLoopFinalRuns,nBackLoopFinalRuns)
+
+// How much money they earned 
+var paymentInfo = {
+  type: 'html-button-response',
+  stimulus: function(){
+    return "<span style='font-size: 22px;'>Congratulations, you have now finished the whole experiment.</br>Thank you for participating!</br></br>"+
+    "You have earned $"+(parseFloat(randomTrial.slice(11,15))*3)+" for taking part.</br>This will be paid to you as a bonus by the experimenter.</br></br>"+
+    "Your completion code is <b>826FCF5F</b></br></br>"+
+    "Press the 'Finish' button to end the task.</br></span>"
+  },
+  choices: ['Finish'],
+  on_finish: function(data) {
+    data.finalPay = parseFloat(randomTrial.slice(11,15))*3
+  }
+};
+
+timeline.push(paymentInfo)
+
+
+// placeholder finish trial
+
+var finishTrial = {
+  type: 'html-keyboard-response',
+  stimulus: "<b><i>FIN</b></i>",
+  choices: jsPsych.NO_KEYS,
+}
+
+timeline.push(finishTrial)
+
+
+  /* start the experiment */
+  function saveData(name, data){
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', 'save_data.php');
+              xhr.setRequestHeader('Content-Type','application/json');
+              xhr.send(JSON.stringify({filename: filename, filedata: data}));
+            };
+
+
+            //jsPsych.data.displayData('csv');
+            jsPsych.init({
+              timeline:timeline,
+              on_trial_finish: function(data){saveData(filename, jsPsych.data.get().csv())},
+              on_finish: function(data){saveData(filename, jsPsych.data.get().csv())}  // uncomment to locally save data file as csv
+            });
+
+      </script>
+
+</html>
